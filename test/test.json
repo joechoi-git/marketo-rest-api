@@ -1,0 +1,14 @@
+{ 
+	"debug": false,
+	"clientId": "",
+	"clientSecret": "",
+	"restEndpoint": "",
+	"lists": { 
+		"listname_1": 1,
+		"listname_2": 2
+	},
+	"campaigns": { 
+		"campaignname_1": 1,
+		"campaignname_2": 2
+	} 
+}

@@ -1,0 +1,26 @@
+{
+  "name": "marketo-rest-api",
+  "version": "0.1.0",
+  "description": "NodeJs interface for Marketo REST API. Syncs leads and sends email campaigns via Marketo platform.",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --reporter spec"
+  },
+  "keywords": [
+    "marketo"
+  ], 
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joechoi-git/marketo-rest-api"
+  },
+  "author": "Joe Choi <joechoi910@gmail.com> (http://www.rga.com)",
+  "license": "MIT",
+  "dependencies": {
+    "request": "^2.64.0",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "chai": "^3.3.0",
+    "mocha": "^2.3.3"
+  }
+}

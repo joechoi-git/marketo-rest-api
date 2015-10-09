@@ -38,7 +38,7 @@ var options = {
 marketo.init(options, function(response){
     console.log(response);
 });
-```js
+```
 
 ## Tests
 

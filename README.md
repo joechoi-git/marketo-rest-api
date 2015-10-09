@@ -16,7 +16,8 @@ Follow the instruction @ http://developers.marketo.com/blog/quick-start-guide-fo
 
 ## Usage
 
-First, initialize marketo-rest-api with your Marketo confirgurations including campaigns and lists. 
+# init(options, callback);
+Initialize marketo-rest-api with your Marketo confirgurations including campaigns and lists. 
 
 ```js
 var marketo = require('marketo-rest-api');
@@ -37,6 +38,48 @@ var options = {
 };
 marketo.init(options, function(response){
     console.log(response);
+});
+```
+
+# syncLead(options, callback);
+Sync leads on Marketo lead database and associates the lead to Marketo list. 
+
+```js
+var options: {
+	'process': 'add' || 'update' || 'remove',
+	'list': 'listname from 'lists':{...} in init()',
+	'input': {
+		'email': 'user@email.com', 
+		'firstName': 'John',
+		'lastName': 'Doe',
+		'title': 'Techie',
+		'phone': '1112223333',
+		'company': 'John Doe Company',
+		'custom_field_1': 'custom_value_1',
+		'custom_field_2': 'custom_value_2',
+		...
+	}
+}
+marketo.syncLead(options, function(response){
+	console.log(response);
+});
+```
+
+# sendEmail(options, callback);
+Schedules Marketo to send an email campaign to selected user.
+
+```js
+var options: {
+	'email': 'user@email.com',
+	'campaign': 'campaignname from 'campaigns':{...} in init()', 
+	'tokens': [
+		{'name': '{{token1_name}}', 'value': 'some value'},
+		{'name': '{{token2_name}}', 'value': 'some value'},
+		...
+	]}
+}
+marketo.sendEmail(options, function(response){
+	console.log(response);
 });
 ```
 

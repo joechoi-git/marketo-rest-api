@@ -1,4 +1,4 @@
-marketo-rest-api
+#marketo-rest-api
 =========
 
 marketo-rest-api is a NodeJs interface for Marketo REST API @ http://developers.marketo.com/documentation/rest/. Syncs leads and sends email campaigns via Marketo platform.
@@ -16,7 +16,7 @@ Follow the instruction @ http://developers.marketo.com/blog/quick-start-guide-fo
 
 ## Usage
 
-# init(options, callback);
+### init(options, callback);
 Initialize marketo-rest-api with your Marketo confirgurations including campaigns and lists. 
 
 ```js
@@ -41,7 +41,7 @@ marketo.init(options, function(response){
 });
 ```
 
-# syncLead(options, callback);
+### syncLead(options, callback);
 Sync leads on Marketo lead database and associates the lead to Marketo list. 
 
 ```js
@@ -65,7 +65,7 @@ marketo.syncLead(options, function(response){
 });
 ```
 
-# sendEmail(options, callback);
+### sendEmail(options, callback);
 Schedules Marketo to send an email campaign to selected user.
 
 ```js

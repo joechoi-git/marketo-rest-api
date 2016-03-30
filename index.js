@@ -155,19 +155,19 @@ var processSyncLead = function (options, callback){
               if(options.debug) console.log('addLeadToList:' + response.success);
               response.leadId = leadId;
               if(response.success === true){
-                callback.apply(null, arguments);
+                callback(response);
               }
               else{
-                callback.apply(null, arguments);
+                callback(response);
               }
             });
           }
           else{
-            callback.apply(null, arguments);
+            callback(response);
           }
         }
         else{
-          callback.apply(null, arguments);
+          callback(response);
         }
       });
       break;

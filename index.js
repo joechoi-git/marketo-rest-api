@@ -153,6 +153,7 @@ var processSyncLead = function (options, callback){
           if(listId !== '') {
             addLeadToList(leadId, listId, function(response){
               if(options.debug) console.log('addLeadToList:' + response.success);
+              response.leadId = leadId;
               if(response.success === true){
                 callback.apply(null, arguments);
               }
@@ -264,6 +265,7 @@ var authenticate = function (authCallback, options, callback) {
         authCallback(options, callback);
       }
       else{
+        response = response || {};
         response.success = false;
         response.error = error;
         response.message = 'Marketo authentication failed.';
@@ -301,6 +303,7 @@ var getLeadId = function (email, callback) {
         callback(response);
       }
       else{
+        response = response || {};
         response.success = false;
         response.error = error;
         response.message = 'Marketo Get Lead Id by Email API failed.';
@@ -332,6 +335,7 @@ var addLeadToList = function (leadId, listId, callback) {
         callback(response);
       }
       else{
+        response = response || {};
         response.success = false;
         response.error = error;
         response.message = 'Marketo Add Lead to List API failed.';
@@ -363,6 +367,7 @@ var removeLeadFromList = function (leadId, listId, callback) {
         callback(response);
       }
       else{
+        response = response || {};
         response.success = false;
         response.error = error;
         response.message = 'Marketo Remove Lead from List API failed.'
@@ -377,12 +382,12 @@ var removeLeadFromList = function (leadId, listId, callback) {
 */
 var addOrUpdateLead = function (options, callback){
   var url = restEndpoint + 'rest/v1/leads.json?access_token=' + accessToken;
+  var lookupField = options.lookupField || 'email';
   var data = {
     'action': 'createOrUpdate',
-    'lookupField': 'email',
+    'lookupField': lookupField,
     'input': [options.input]
   };
-  data.input[0].email = options.email;
   request({
       method: 'POST',
       headers: header(),
@@ -396,6 +401,7 @@ var addOrUpdateLead = function (options, callback){
         callback(response);
       }
       else{
+        response = response || {};
         response.success = false;
         response.error = error;
         response.message = 'Marketo Add & Edit Lead API failed.';
@@ -427,6 +433,7 @@ var removeLead = function (leadId, callback){
         callback(response);
       }
       else{
+        response = response || {};
         response.success = false;
         response.error = error;
         response.message = 'Marketo Remove Lead API failed.';
@@ -439,11 +446,10 @@ var removeLead = function (leadId, callback){
   Associates lead with marketo cookie
   http://developers.marketo.com/documentation/rest/associate-lead/
 */
-var associateLeadWithCookie = function (leadId, cookieId, callback) {
+exports.associateLeadWithCookie = function (leadId, cookieId, callback) {
   var token = '?access_token=' + accessToken;
   var cookie = '&cookie=' + cookieId.replace('&', '%46');
   var url = restEndpoint + 'rest/v1/leads/' + leadId + '/associate.json' + token + cookie;
-
   request({
     'method': 'POST',
     'headers': header(),
@@ -455,6 +461,7 @@ var associateLeadWithCookie = function (leadId, cookieId, callback) {
         callback(response);
       }
       else{
+        response = response || {};
         response.success = false;
         response.error = error;
         response.message = 'Marketo Associate Lead API failed.';
@@ -493,6 +500,7 @@ var requestCampaign = function (campaignId, leadId, tokens, callback){
         callback({'success':true, 'campaignId':response});
       }
       else{
+        response = response || {};
         response.success = false;
         response.error = error;
         response.message = 'Marketo Request Campaign API failed.';

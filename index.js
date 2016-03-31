@@ -388,11 +388,11 @@ var addOrUpdateLead = function (options, callback){
     'input': [options.input]
   };
   request({
-      method: 'POST',
-      headers: header(),
-      url: url,
-      body: data,
-      json: true,
+    method: 'POST',
+    headers: header(),
+    url: url,
+    body: data,
+    json: true,
   }, function (error, response, body) {
       if (!error && response.statusCode === 200 && !_.isEmpty(body) && body.success === true && body.result[0].id) {
         response.success = true;

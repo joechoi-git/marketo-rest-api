@@ -383,6 +383,7 @@ var removeLeadFromList = function (leadId, listId, callback) {
 var addOrUpdateLead = function (options, callback){
   var url = restEndpoint + 'rest/v1/leads.json?access_token=' + accessToken;
   var lookupField = options.lookupField || 'email';
+  console.log('lookupfield: ', lookupField);
   var data = {
     'action': 'createOrUpdate',
     'lookupField': lookupField,

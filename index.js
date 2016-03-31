@@ -380,9 +380,13 @@ var removeLeadFromList = function (leadId, listId, callback) {
   Adds or updates lead from Marketo.
   http://developers.marketo.com/documentation/rest/createupdate-leads/
 */
-var emailData = '';
+var emailData;
 exports.getEmailData = function() {
   return emailData;
+}
+
+var setEmailData = function(data) {
+  emailData = data;
 }
 
 var addOrUpdateLead = function (options, callback){
@@ -392,7 +396,7 @@ var addOrUpdateLead = function (options, callback){
     'lookupField': 'email',
     'input': [options.input]
   };
-  emailData = data;
+  setEmailData(data);
   request({
     method: 'POST',
     headers: header(),

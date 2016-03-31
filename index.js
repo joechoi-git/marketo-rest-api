@@ -382,12 +382,12 @@ var removeLeadFromList = function (leadId, listId, callback) {
 */
 var addOrUpdateLead = function (options, callback){
   var url = restEndpoint + 'rest/v1/leads.json?access_token=' + accessToken;
-  var lookupField = 'bb_email__c';
   var data = {
     'action': 'createOrUpdate',
-    'lookupField': lookupField,
+    'lookupField': 'email',
     'input': [options.input]
   };
+  data.input[0].email = options.email;
   request({
       method: 'POST',
       headers: header(),

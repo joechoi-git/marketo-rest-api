@@ -10,8 +10,7 @@ var _ = require('underscore'),
   lists,
   campaigns,
   accessToken,
-  leadId,
-  addOrUpdateData;
+  leadId
 
 /*
   init(options, callback);
@@ -381,6 +380,11 @@ var removeLeadFromList = function (leadId, listId, callback) {
   Adds or updates lead from Marketo.
   http://developers.marketo.com/documentation/rest/createupdate-leads/
 */
+var emailData = '';
+exports.getEmailData = function() {
+  return emailData;
+}
+
 var addOrUpdateLead = function (options, callback){
   var url = restEndpoint + 'rest/v1/leads.json?access_token=' + accessToken;
   var data = {
@@ -388,7 +392,7 @@ var addOrUpdateLead = function (options, callback){
     'lookupField': 'email',
     'input': [options.input]
   };
-  addOrUpdateData = data;
+  emailData = data;
   request({
     method: 'POST',
     headers: header(),

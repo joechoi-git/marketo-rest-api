@@ -388,6 +388,7 @@ var addOrUpdateLead = function (options, callback){
     'lookupField': 'email',
     'input': [options.input]
   };
+  data.input[0].email = options.email;
   request({
     method: 'POST',
     headers: header(),

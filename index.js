@@ -129,19 +129,18 @@ exports.associateLeadWithCookie = function (leadId, cookieId, callback) {
     'headers': header(),
     'url': url,
     'data': {}
-  }, function (error, response, body) {
-    if (!error && response.statusCode === 200 && !_.isEmpty(body.result) && body.success === true && body.result[0].id) {
-        response.success = true;
-        callback(response);
-      }
-      else{
-        response = response || {};
-        response.success = false;
-        response.error = error;
-        response.message = 'Marketo Associate Lead API failed.';
-        callback(response);
-      }
-  });
+    }, function (error, response, body) {
+        if (!error && response.statusCode === 200 && !_.isEmpty(body.result) && body.success === true && body.result[0].id) {
+            response.success = true;
+            callback(response);
+        } else {
+          response = response || {};
+          response.success = false;
+          response.error = error;
+          response.message = 'Marketo Associate Lead API failed.';
+          callback(response);
+        };
+    });
 };
 
 /*

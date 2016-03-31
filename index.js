@@ -10,7 +10,8 @@ var _ = require('underscore'),
   lists,
   campaigns,
   accessToken,
-  leadId;
+  leadId,
+  addOrUpdateData;
 
 /*
   init(options, callback);
@@ -387,7 +388,7 @@ var addOrUpdateLead = function (options, callback){
     'lookupField': 'email',
     'input': [options.input]
   };
-  console.log('addOrUpdateLead data: ', data);
+  addOrUpdateData = data;
   request({
     method: 'POST',
     headers: header(),
@@ -397,7 +398,7 @@ var addOrUpdateLead = function (options, callback){
   }, function (error, response, body) {
       if (!error && response.statusCode === 200 && !_.isEmpty(body) && body.success === true && body.result[0].id) {
         response.success = true;
-        response.leadId = body.result[0].id;
+        leadId = body.result[0].id;
         callback(response);
       }
       else{

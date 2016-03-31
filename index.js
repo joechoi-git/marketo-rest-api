@@ -396,7 +396,7 @@ var addOrUpdateLead = function (options, callback){
     body: data,
     json: true,
   }, function (error, response, body) {
-      if (!error && response.statusCode === 200 && !_.isEmpty(body) && body.success === true && body.result[0].id) {
+      if (!error && response.statusCode === 200 && !_.isEmpty(body) && body.success === true && body.result[0].id && body.result[0].status !== 'skipped') {
         response.success = true;
         leadId = body.result[0].id;
         callback(response);
@@ -405,7 +405,6 @@ var addOrUpdateLead = function (options, callback){
         response = response || {};
         response.success = false;
         response.error = error;
-        response.message = 'Marketo Add & Edit Lead API failed.';
         callback(response);
       }
   });

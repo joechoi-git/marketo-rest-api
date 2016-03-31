@@ -382,8 +382,7 @@ var removeLeadFromList = function (leadId, listId, callback) {
 */
 var addOrUpdateLead = function (options, callback){
   var url = restEndpoint + 'rest/v1/leads.json?access_token=' + accessToken;
-  var lookupField = options.lookupField || 'email';
-  console.log('lookupfield: ', lookupField);
+  var lookupField = 'bb_email__c';
   var data = {
     'action': 'createOrUpdate',
     'lookupField': lookupField,
@@ -406,7 +405,6 @@ var addOrUpdateLead = function (options, callback){
         response.success = false;
         response.error = error;
         response.message = 'Marketo Add & Edit Lead API failed.';
-        console.log(' error: ', JSON.stringify(error), ' response: ', JSON.stringify(response), ' body: ', JSON.stringify(body));
         callback(response);
       }
   });

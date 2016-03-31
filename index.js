@@ -384,7 +384,7 @@ var addOrUpdateLead = function (options, callback){
   var url = restEndpoint + 'rest/v1/leads.json?access_token=' + accessToken;
   var data = {
     'action': 'createOrUpdate',
-    'lookupField': 'email',
+    'lookupField': 'Email',
     'input': [options.input]
   };
   request({

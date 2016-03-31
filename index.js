@@ -153,21 +153,20 @@ var processSyncLead = function (options, callback){
           if(listId !== '') {
             addLeadToList(leadId, listId, function(response){
               if(options.debug) console.log('addLeadToList:' + response.success);
-              response.leadId = leadId;
               if(response.success === true){
-                callback(response);
+                callback({'success':true, 'message':message});
               }
               else{
-                callback(response);
+                callback({'success':false, 'error':response.error});
               }
             });
           }
           else{
-            callback(response);
+            callback({'success':true, 'message':message});
           }
         }
         else{
-          callback(response);
+          callback({'success':false, 'error':response.error});
         }
       });
       break;
@@ -316,6 +315,7 @@ var getLeadId = function (email, callback) {
   Adds Marketo lead to Marketo list.
   http://developers.marketo.com/documentation/rest/add-leads-to-list/
 */
+
 var addLeadToList = function (leadId, listId, callback) {
   var url = restEndpoint + 'rest/v1/lists/' + listId + '/leads.json?access_token=' + accessToken;
   var data = {
@@ -331,15 +331,10 @@ var addLeadToList = function (leadId, listId, callback) {
       json: true,
   }, function (error, response, body) {
       if (!error && response.statusCode === 200 && !_.isEmpty(body) && body.success === true && body.result[0].id) {
-        response.success = true
-        callback(response);
+        callback({'success':true});
       }
       else{
-        response = response || {};
-        response.success = false;
-        response.error = error;
-        response.message = 'Marketo Add Lead to List API failed.';
-        callback(response);
+        callback({'success':false, 'error':'Marketo Add Lead to List API failed. with error: ' + error});
       }
   });
 };
@@ -390,22 +385,17 @@ var addOrUpdateLead = function (options, callback){
   };
   data.input[0].email = options.email;
   request({
-    method: 'POST',
-    headers: header(),
-    url: url,
-    body: data,
-    json: true,
+      method: 'POST',
+      headers: header(),
+      url: url,
+      body: data,
+      json: true,
   }, function (error, response, body) {
-      if (!error && response.statusCode === 200 && !_.isEmpty(body) && body.success === true && body.result[0].id && body.result[0].status !== 'skipped') {
-        response.success = true;
-        leadId = body.result[0].id;
-        callback(response);
+      if (!error && response.statusCode === 200 && !_.isEmpty(body) && body.success === true && body.result[0].id) {
+        callback({'success':true, 'leadId':body.result[0].id});
       }
       else{
-        response = response || {};
-        response.success = false;
-        response.error = error;
-        callback(response);
+        callback({'success':false, 'error':'Marketo Add & Edit Lead API failed.'});
       }
   });
 };

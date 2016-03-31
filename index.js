@@ -117,6 +117,34 @@ exports.sendEmail = function (options, callback) {
 };
 
 /*
+  Associates lead with marketo cookie
+  http://developers.marketo.com/documentation/rest/associate-lead/
+*/
+exports.associateLeadWithCookie = function (leadId, cookieId, callback) {
+  var token = '?access_token=' + accessToken;
+  var cookie = '&cookie=' + cookieId.replace('&', '%26');
+  var url = restEndpoint + 'rest/v1/leads/' + leadId + '/associate.json' + token + cookie;
+  request({
+    'method': 'POST',
+    'headers': header(),
+    'url': url,
+    'data': {}
+  }, function (error, response, body) {
+    if (!error && response.statusCode === 200 && !_.isEmpty(body.result) && body.success === true && body.result[0].id) {
+        response.success = true;
+        callback(response);
+      }
+      else{
+        response = response || {};
+        response.success = false;
+        response.error = error;
+        response.message = 'Marketo Associate Lead API failed.';
+        callback(response);
+      }
+  });
+};
+
+/*
   After Marketo API variables are loaded, verify authentication and return token if authenticated.
 */
 var processInit = function (options, callback){
@@ -443,33 +471,6 @@ var removeLead = function (leadId, callback){
   });
 };
 
-/*
-  Associates lead with marketo cookie
-  http://developers.marketo.com/documentation/rest/associate-lead/
-*/
-exports.associateLeadWithCookie = function (leadId, cookieId, callback) {
-  var token = '?access_token=' + accessToken;
-  var cookie = '&cookie=' + cookieId.replace('&', '%26');
-  var url = restEndpoint + 'rest/v1/leads/' + leadId + '/associate.json' + token + cookie;
-  request({
-    'method': 'POST',
-    'headers': header(),
-    'url': url,
-    'data': {}
-  }, function (error, response, body) {
-    if (!error && response.statusCode === 200 && !_.isEmpty(body.result) && body.success === true && body.result[0].id) {
-        response.success = true;
-        callback(response);
-      }
-      else{
-        response = response || {};
-        response.success = false;
-        response.error = error;
-        response.message = 'Marketo Associate Lead API failed.';
-        callback(response);
-      }
-  });
-}
 
 /*
   Requests campaign in Marketo.

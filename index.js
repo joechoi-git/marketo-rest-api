@@ -1,5 +1,5 @@
 /*
-  Author: Joe Choi <joechoi910@gmail.com> 
+  Author: Joe Choi <joechoi910@gmail.com>
 */
 'use strict';
 var _ = require('underscore'),
@@ -56,12 +56,12 @@ exports.init = function (options, callback) {
   syncLead(options, callback);
   Sync leads on Marketo lead database and associates the lead to Marketo list.
 
-  Example: 
+  Example:
   var options: {
     'process': 'add' || 'update' || 'remove',
     'list': 'listname from 'lists':{...} in init()',
     'input': {
-      'email': 'user@email.com', 
+      'email': 'user@email.com',
       'firstName': 'John',
       'lastName': 'Doe',
       'title': 'Techie',
@@ -91,10 +91,10 @@ exports.syncLead = function (options, callback) {
   sendEmail(options, callback);
   Schedules Marketo to send an email campaign to selected user.
 
-  Example: 
+  Example:
   var options: {
     'email': 'user@email.com',
-    'campaign': 'campaignname from 'campaigns':{...} in init()', 
+    'campaign': 'campaignname from 'campaigns':{...} in init()',
     'tokens': [
       {'name': '{{token1_name}}', 'value': 'some value'},
       {'name': '{{token2_name}}', 'value': 'some value'},
@@ -126,7 +126,7 @@ var processInit = function (options, callback){
 /*
   After authenticated with Marketo API, execute lead sync job using Marketo API.
 
-  For add & update lead, 
+  For add & update lead,
     1) add or update lead
     2) add lead to list
   For remove lead,
@@ -153,20 +153,21 @@ var processSyncLead = function (options, callback){
           if(listId !== '') {
             addLeadToList(leadId, listId, function(response){
               if(options.debug) console.log('addLeadToList:' + response.success);
+              response.leadId = leadId;
               if(response.success === true){
-                callback({'success':true, 'message':message});
+                callback(response);
               }
               else{
-                callback({'success':false, 'error':response.error});
+                callback(response);
               }
             });
           }
           else{
-            callback({'success':true, 'message':message});
+            callback(response);
           }
         }
         else{
-          callback({'success':false, 'error':response.error});
+          callback(response);
         }
       });
       break;
@@ -176,36 +177,37 @@ var processSyncLead = function (options, callback){
       getLeadId(options.email, function(response){
         if(options.debug) console.log('getLeadId:' + response.success);
         if(response.success === true){
-          
+
           // 2) remove lead
           var leadId = response.leadId;
           removeLead(leadId, function(response){
             if(options.debug) console.log('removeLead:' + response.success);
             if(response.success === true){
-              
+
               // 3) remove lead from list
               if(listId !== '') {
                 removeLeadFromList(leadId, listId, function(response){
                   if(options.debug) console.log('removeLeadFromList:' + response.success);
                   if(response.success === true){
-                    callback({'success':true, 'message':'Lead Id ' + leadId + ' is successfully removed from Marketo.'});
-                  }
-                  else{
-                    callback({'success':false, 'error':response.error});
+                    response.message='Lead Id ' + leadId + ' is successfully removed from Marketo.';
+                    callback(response);
+                  } else{
+                    response.success=false;
+                    callback(response);
                   }
                 });
+              } else{
+                response.message='Lead Id ' + leadId + ' is successfully removed from Marketo.';
+                callback(response);
               }
-              else{
-                callback({'success':true, 'message':'Lead Id ' + leadId + ' is successfully removed from Marketo.'});
-              }
-            }
-            else{
-              callback({'success':false, 'error':response.error});
+            } else{
+              response.success=false;
+              callback(response);
             }
           });
-        }
-        else{
-          callback({'success':false, 'error':response.error});
+        } else{
+          response.success=false;
+          callback(response);
         }
       });
       break;
@@ -227,7 +229,7 @@ var processSendEmail = function (options, callback){
   getLeadId(options.email, function(response){
     if(options.debug) console.log('getLeadId:' + response.success);
     if(response.success === true){
-      
+
       // 2) request campaign
       var leadId = response.leadId;
       requestCampaign(campaignId, leadId, options.tokens, function(response){
@@ -263,7 +265,11 @@ var authenticate = function (authCallback, options, callback) {
         authCallback(options, callback);
       }
       else{
-        callback({'success':false, 'error':'Marketo authentication failed.'});
+        response = response || {};
+        response.success = false;
+        response.error = error;
+        response.message = 'Marketo authentication failed.';
+        callback(response);
       }
   });
 };
@@ -292,10 +298,16 @@ var getLeadId = function (email, callback) {
       json: true,
   }, function (error, response, body) {
       if (!error && response.statusCode === 200 && !_.isEmpty(body.result) && body.success === true) {
-        callback({'success':true, 'leadId':body.result[0].id});
+        response.success = true;
+        response.leadId = body.result[0].id;
+        callback(response);
       }
       else{
-        callback({'success':false, 'error':'Marketo Get Lead Id by Email API failed.'});
+        response = response || {};
+        response.success = false;
+        response.error = error;
+        response.message = 'Marketo Get Lead Id by Email API failed.';
+        callback(response);
       }
   });
 }
@@ -306,10 +318,10 @@ var getLeadId = function (email, callback) {
 */
 var addLeadToList = function (leadId, listId, callback) {
   var url = restEndpoint + 'rest/v1/lists/' + listId + '/leads.json?access_token=' + accessToken;
-  var data = { 
+  var data = {
     'input': [{
       'id': leadId
-    }] 
+    }]
   };
   request({
       method: 'POST',
@@ -319,10 +331,15 @@ var addLeadToList = function (leadId, listId, callback) {
       json: true,
   }, function (error, response, body) {
       if (!error && response.statusCode === 200 && !_.isEmpty(body) && body.success === true && body.result[0].id) {
-        callback({'success':true});
+        response.success = true
+        callback(response);
       }
       else{
-        callback({'success':false, 'error':'Marketo Add Lead to List API failed.'});
+        response = response || {};
+        response.success = false;
+        response.error = error;
+        response.message = 'Marketo Add Lead to List API failed.';
+        callback(response);
       }
   });
 };
@@ -333,10 +350,10 @@ var addLeadToList = function (leadId, listId, callback) {
 */
 var removeLeadFromList = function (leadId, listId, callback) {
   var url = restEndpoint + 'rest/v1/lists/' + listId + '/leads.json?access_token=' + accessToken + '&_method=DELETE';
-  var data = { 
+  var data = {
     'input': [{
       'id': leadId
-    }] 
+    }]
   };
   request({
       method: 'POST',
@@ -346,10 +363,15 @@ var removeLeadFromList = function (leadId, listId, callback) {
       json: true,
   }, function (error, response, body) {
       if (!error && response.statusCode === 200 && !_.isEmpty(body) && body.success === true && body.result[0].id) {
-        callback({'success':true});
+        response.success = true;
+        callback(response);
       }
       else{
-        callback({'success':false, 'error':'Marketo Remove Lead from List API failed.'});
+        response = response || {};
+        response.success = false;
+        response.error = error;
+        response.message = 'Marketo Remove Lead from List API failed.'
+        callback(response);
       }
   });
 };
@@ -360,12 +382,12 @@ var removeLeadFromList = function (leadId, listId, callback) {
 */
 var addOrUpdateLead = function (options, callback){
   var url = restEndpoint + 'rest/v1/leads.json?access_token=' + accessToken;
-  var data = { 
-    'action': 'createOrUpdate', 
-    'lookupField': 'email',
-    'input': [options.input] 
+  var lookupField = options.lookupField || 'email';
+  var data = {
+    'action': 'createOrUpdate',
+    'lookupField': lookupField,
+    'input': [options.input]
   };
-  data.input[0].email = options.email;
   request({
       method: 'POST',
       headers: header(),
@@ -374,10 +396,16 @@ var addOrUpdateLead = function (options, callback){
       json: true,
   }, function (error, response, body) {
       if (!error && response.statusCode === 200 && !_.isEmpty(body) && body.success === true && body.result[0].id) {
-        callback({'success':true, 'leadId':body.result[0].id});
+        response.success = true;
+        response.leadId = body.result[0].id;
+        callback(response);
       }
       else{
-        callback({'success':false, 'error':'Marketo Add & Edit Lead API failed.'});
+        response = response || {};
+        response.success = false;
+        response.error = error;
+        response.message = 'Marketo Add & Edit Lead API failed.';
+        callback(response);
       }
   });
 };
@@ -388,10 +416,10 @@ var addOrUpdateLead = function (options, callback){
 */
 var removeLead = function (leadId, callback){
   var url = restEndpoint + 'rest/v1/leads.json?access_token=' + accessToken;
-  var data = { 
+  var data = {
     'input': [{
       'id': leadId
-    }] 
+    }]
   };
   request({
       method: 'DELETE',
@@ -401,13 +429,46 @@ var removeLead = function (leadId, callback){
       json: true,
   }, function (error, response, body) {
       if (!error && response.statusCode === 200 && !_.isEmpty(body.result) && body.success === true && body.result[0].id) {
-        callback({'success':true});
+        response.success = true;
+        callback(response);
       }
       else{
-        callback({'success':false, 'error':'Marketo Remove Lead API failed.'});
+        response = response || {};
+        response.success = false;
+        response.error = error;
+        response.message = 'Marketo Remove Lead API failed.';
+        callback(response);
       }
   });
 };
+
+/*
+  Associates lead with marketo cookie
+  http://developers.marketo.com/documentation/rest/associate-lead/
+*/
+exports.associateLeadWithCookie = function (leadId, cookieId, callback) {
+  var token = '?access_token=' + accessToken;
+  var cookie = '&cookie=' + cookieId.replace('&', '%46');
+  var url = restEndpoint + 'rest/v1/leads/' + leadId + '/associate.json' + token + cookie;
+  request({
+    'method': 'POST',
+    'headers': header(),
+    'url': url,
+    'data': {}
+  }, function (error, response, body) {
+    if (!error && response.statusCode === 200 && !_.isEmpty(body.result) && body.success === true && body.result[0].id) {
+        response.success = true;
+        callback(response);
+      }
+      else{
+        response = response || {};
+        response.success = false;
+        response.error = error;
+        response.message = 'Marketo Associate Lead API failed.';
+        callback(response);
+      }
+  });
+}
 
 /*
   Requests campaign in Marketo.
@@ -415,12 +476,12 @@ var removeLead = function (leadId, callback){
 */
 var requestCampaign = function (campaignId, leadId, tokens, callback){
   var url = restEndpoint + 'rest/v1/campaigns/' + campaignId + '/trigger.json?access_token=' + accessToken;
-  var data = { 
+  var data = {
     'input': {
       'leads': [{
         'id': leadId
       }],
-    } 
+    }
   };
   // add tokens if exists
   if (tokens && tokens.length > 0){
@@ -434,10 +495,16 @@ var requestCampaign = function (campaignId, leadId, tokens, callback){
       json: true,
   }, function (error, response, body) {
       if (!error && response.statusCode === 200 && !_.isEmpty(body.result) && body.success === true && body.result[0].id) {
-        callback({'success':true, 'campaignId':body.result[0].id});
+        response.success = true;
+        response.campaignId = body.result[0].id;
+        callback({'success':true, 'campaignId':response});
       }
       else{
-        callback({'success':false, 'error':'Marketo Request Campaign API failed.'});
+        response = response || {};
+        response.success = false;
+        response.error = error;
+        response.message = 'Marketo Request Campaign API failed.';
+        callback(response);
       }
   });
 };

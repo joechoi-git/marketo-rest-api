@@ -449,7 +449,7 @@ var removeLead = function (leadId, callback){
 */
 exports.associateLeadWithCookie = function (leadId, cookieId, callback) {
   var token = '?access_token=' + accessToken;
-  var cookie = '&cookie=' + cookieId.replace('&', '%46');
+  var cookie = '&cookie=' + cookieId.replace('&', '%26');
   var url = restEndpoint + 'rest/v1/leads/' + leadId + '/associate.json' + token + cookie;
   request({
     'method': 'POST',

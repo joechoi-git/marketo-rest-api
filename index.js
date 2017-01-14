@@ -144,6 +144,39 @@ exports.associateLeadWithCookie = function (leadId, cookieId, callback) {
 };
 
 /*
+  var options = {
+    method: 'GET' | 'POST',
+    path: 'leads',
+    data: {}
+  }
+*/
+var callRestEndpoint = function(options, callback) {
+  var token = '?access_token=' + accessToken;
+  var filter = '&filterType=' + options.filterType + '&filterValues=' + options.filterValues;
+  var url = restEndpoint + 'rest/v1/' + options.path + '.json' + token + filter;
+  var result = request({
+    'method': options.method,
+    'headers': header(),
+    'url': url,
+    'data': options.data
+  }, function(err, res, body) {
+    if(err) return console.log(arguments);
+    callback(body);
+ })
+}
+
+exports.idFromSfdcId = function(opts, callback) {
+  var options = {
+    path: 'leads',
+    filterType: 'sfdcLeadId',
+    filterValues: opts.sfdc_id,
+    method: 'GET',
+    data: {}
+  }
+  callRestEndpoint(options, callback);
+}
+
+/*
   After Marketo API variables are loaded, verify authentication and return token if authenticated.
 */
 var processInit = function (options, callback){
@@ -411,7 +444,7 @@ var addOrUpdateLead = function (options, callback){
   var url = restEndpoint + 'rest/v1/leads.json?access_token=' + accessToken;
   var data = {
     'action': 'createOrUpdate',
-    'lookupField': 'email',
+    'lookupField': options.lookupField || 'email',
     'input': [options.input]
   };
   data.input[0].email = options.email;

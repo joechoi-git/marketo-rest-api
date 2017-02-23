@@ -1,14 +1,14 @@
 { 
 	"debug": false,
-	"clientId": "",
-	"clientSecret": "",
-	"restEndpoint": "",
-	"lists": { 
-		"listname_1": 1,
-		"listname_2": 2
+	"clientId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+	"clientSecret": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+	"restEndpoint": "https://xxx-xxx-xxx.mktorest.com/",
+	"email": "john.doe@company.com",
+	"lists": {
+		"listname_1": 1001
 	},
 	"campaigns": { 
-		"campaignname_1": 1,
-		"campaignname_2": 2
-	} 
+		"campaignname_1": 2001,
+		"campaignname_2": 2002
+	}
 }

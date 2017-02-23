@@ -117,6 +117,36 @@ exports.sendEmail = function (options, callback) {
 };
 
 /*
+  scheduleCampaign(options, callback);
+  Schedules campaign in Marketo.
+  http://developers.marketo.com/documentation/rest/schedule-campaign/
+
+  Example:
+  var options: {
+    'campaign': 'campaignname from 'campaigns':{...} in init()',
+    'runAt': '2017-02-22T23:59:00.000Z',
+    'tokens': [
+      {'name': '{{token1_name}}', 'value': 'some value'},
+      {'name': '{{token2_name}}', 'value': 'some value'},
+      ...
+    ]}
+  }
+  marketo.scheduleCampaign(options, function(response){
+    console.log(response);
+  });
+
+  Success:
+  { 'success':true }
+
+  Error:
+  { 'success':false, 'error':'Error message.' }
+*/
+exports.scheduleCampaign = function (options, callback) {
+  if(options.debug) console.log(options);
+  authenticate(processScheduleCampaign, options, callback);
+};
+
+/*
   Associates lead with marketo cookie
   http://developers.marketo.com/documentation/rest/associate-lead/
 */
@@ -275,7 +305,7 @@ var processSyncLead = function (options, callback){
 };
 
 /*
-  After authenticated with Marketo API, execute schedule campaign API call.
+  After authenticated with Marketo API, execute request campaign API call.
   1) get lead id
   2) request campaign
 */
@@ -305,6 +335,42 @@ var processSendEmail = function (options, callback){
     else{
       callback({'success':false, 'error':response.error});
     }
+  });
+};
+
+/*
+  After authenticated with Marketo API, execute schedule campaign API call.
+*/
+var processScheduleCampaign = function (options, callback){
+  var campaignId = campaigns[options.campaign];
+  if (typeof campaignId === 'undefined'){
+    callback({'success':false, 'error':'campaignId is not found.'});
+    return;
+  }  
+  var url = restEndpoint + 'rest/v1/campaigns/' + campaignId + '/schedule.json?access_token=' + accessToken;
+  var data = {
+    'input': options.input
+  };
+
+  request({
+      method: 'POST',
+      headers: header(),
+      url: url,
+      body: data,
+      json: true,
+  }, function (error, response, body) {
+      if(options.debug) console.log('scheduleCampaign', response.body.success);
+      if (!error && response.statusCode === 200 && response.body.success && response.body.success === true && response.body.requestId) {
+        callback({'success':true, 'message':'Campaign Id ' + campaignId + ' has been successfully scheduled. Request Id is ' + response.body.requestId + '.'});
+      }
+      else{
+        if (response.body.errors && response.body.errors.length > 0 && response.body.errors[0].message) {
+          callback({'success':false, 'error':response.body.errors[0].message});
+        }
+        else {
+          callback({'success':false, 'error':'Schedule campaign failed.'});
+        }
+      }
   });
 };
 
@@ -503,7 +569,6 @@ var removeLead = function (leadId, callback){
   });
 };
 
-
 /*
   Requests campaign in Marketo.
   http://developers.marketo.com/documentation/rest/request-campaign/
@@ -542,4 +607,3 @@ var requestCampaign = function (campaignId, leadId, tokens, callback){
       }
   });
 };
-

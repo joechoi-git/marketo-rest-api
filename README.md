@@ -83,6 +83,24 @@ marketo.sendEmail(options, function(response){
 });
 ```
 
+### scheduleCampaign(options, callback);
+Schedules campaign in Marketo.
+
+```js
+var options: {
+	'campaign': 'campaignname from 'campaigns':{...} in init()', 
+	'runAt': '2020-02-22T23:59:00.000Z',
+	'tokens': [
+		{'name': '{{token1_name}}', 'value': 'some value'},
+		{'name': '{{token2_name}}', 'value': 'some value'},
+		...
+	]}
+}
+marketo.scheduleCampaign(options, function(response){
+	console.log(response);
+});
+```
+
 ## Tests
 
 Before running test for the first time, provide Marketo API values in ./test/test.json. 
@@ -93,4 +111,5 @@ $ npm test
 
 ## Release History
 
+* 0.2.0 Schedule Campaign added
 * 0.1.0 Initial release
